@@ -1,5 +1,5 @@
 # Player
-Simple audio streaming demo with HTML5/FLASH player, based on SRS.
+Simple audio streaming demo with HTML5/FLASH player, based on [SRS](http://ossrs.net).
 
 Requirements:
 - Python 2.7+
@@ -14,8 +14,8 @@ Requirements:
     # Deploy
     $ make deploy
 
-    # Deploy or provision with tags
-    $ TAGS=player make deploy
+    # Provision with tags
+    $ TAGS=provision make deploy
 
 ## Development:
 
