@@ -1,4 +1,6 @@
 ---
+apt_cache_valid_time: 86400
+default_timezone: Europe/Moscow
 user: player
 ports:
   - { port: 1935, proto: tcp}

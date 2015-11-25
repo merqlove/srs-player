@@ -1,6 +1,9 @@
 ---
 - name: Clone code
-  git: repo={{ app_git }} dest="{{app_root}}" version=master accept_hostkey=yes
+  git: repo="{{ app_git }}"
+       dest="{{app_root}}"
+       version=master
+       accept_hostkey=yes
   register: git
 
 - include: prepare.yml

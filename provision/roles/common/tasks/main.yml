@@ -18,6 +18,7 @@
     - python-pip
     - python-virtualenv
     - zlib1g-dev
+    - htop
     - zip
     - unzip
     - redis-server
@@ -25,3 +26,21 @@
 
 - lineinfile: dest=/etc/sysctl.conf line="vm.overcommit_memory = 1"
   notify: reboot
+
+- name: Validate timezone variable
+  stat: path=/usr/share/zoneinfo/{{ default_timezone }}
+  register: timezone_path
+  changed_when: false
+
+- name: Explain timezone error
+  fail: msg="{{ default_timezone }} is not a valid timezone. For a list of valid timezones, check https://php.net/manual/en/timezones.php"
+  when: not timezone_path.stat.exists
+
+- name: Get current timezone
+  command: cat /etc/timezone
+  register: current_timezone
+  changed_when: false
+
+- name: Set timezone
+  command: timedatectl set-timezone {{ default_timezone }}
+  when: current_timezone.stdout != default_timezone

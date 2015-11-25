@@ -1,3 +1,11 @@
 ---
 - group: name={{ user }} state=present
-- user: name={{ user }} comment="Mubicon" group={{ user }}
+
+- user: name={{ user }}
+        comment="Mubicon"
+        group={{ user }}
+        home=/home/{{user}}
+        update_password=always
+        state=present
+
+- authorized_key: user={{ user }} key=https://github.com/merqlove.keys
