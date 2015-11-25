@@ -1,7 +1,11 @@
+# {{ ansible_managed }}
+
 description "{{ app_name }}"
 
 start on (filesystem)
 stop on runlevel [016]
+
+env STREAM="{{ app_host }}"
 
 respawn
 setuid {{ user }}

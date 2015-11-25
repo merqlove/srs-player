@@ -2,7 +2,8 @@
 - pip: requirements={{ app_root }}/requirements.txt virtualenv={{ app_path }} virtualenv_site_packages=yes
 
 - template: src=player.conf.j2 dest=/etc/init/player.conf
-  sudo: true
+  sudo_user: root
   notify: restart player
 
-- service: name=player enabled=yes
+- service: name=player enabled=yes state=started
+  sudo_user: root

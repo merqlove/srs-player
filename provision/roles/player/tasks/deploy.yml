@@ -7,4 +7,3 @@
   register: git
 
 - include: prepare.yml
-  when: git.before != git.after

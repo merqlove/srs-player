@@ -8,7 +8,8 @@
   notify: restart nginx
 
 - include: deploy.yml
-  sudo: no
+  sudo: yes
+  sudo_user: "{{ user }}"
   when: user != 'vagrant'
 
 - include: vagrant.yml
