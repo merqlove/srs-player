@@ -102,7 +102,7 @@ $(document).ready(function() {
       { type: "rtmp/flv", src: 'rtmp://' + DOMAIN + '/' + CHANNEL + '/' + stream_id },
 //      { type: 'application/x-mpegURL', src: 'http://' + DOMAIN + ':' + PORT + '/' + CHANNEL + '/' + stream_id + '_ff.m3u8' },
       { type: "audio/mp3", src: 'http://' + DOMAIN + ':' + PORT + '/' + CHANNEL + '/' + stream_id + '.mp3' }
-    ])
+    ]);
   }
 
   // State pusher

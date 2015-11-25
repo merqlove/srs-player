@@ -6,7 +6,6 @@ import subprocess as sp
 import signal
 import uuid
 from random import randint
-
 import redis
 import time
 import logging
@@ -70,18 +69,18 @@ def is_process_running(pid):
     try:
         proc = psutil.Process(int(pid))
         status = proc.status()
-        return status != psutil.STATUS_ZOMBIE
+        return status == psutil.STATUS_RUNNING
     except (OSError, psutil.NoSuchProcess):
         return False
 
 
 def run(stream_id=None, playlist=None, retry=False):
-    if stream_id and not retry:
+    if stream_id:
         pipe = find(stream_id)
         if pipe and is_process_running(pipe['pid']):
             return stream_id
 
-    if stream_id and not retry:
+    if not retry:
         stream_id = uuid.uuid4()
 
     if not playlist:
@@ -188,7 +187,8 @@ if is_develop():
 
 @app.route('/')
 def static_page():
-    return render_template('index.html', server={'domain': DOMAIN, 'channel': CHANNEL, 'port': SRS_PORT, 'stream_id': None})
+    return render_template('index.html',
+                           server={'domain': DOMAIN, 'channel': CHANNEL, 'port': SRS_PORT, 'stream_id': None})
 
 
 # API
