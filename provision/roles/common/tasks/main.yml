@@ -44,3 +44,19 @@
 - name: Set timezone
   command: timedatectl set-timezone {{ default_timezone }}
   when: current_timezone.stdout != default_timezone
+
+- name: set to local
+  lineinfile:
+    dest=/etc/hosts
+    line="127.0.1.1 {{ inventory_hostname }} {{ ansible_hostname }}"
+    regexp="^127\.0\.1\.1.*$"
+    state=present
+  when: user != 'vagrant'
+
+- name: set to ip
+  lineinfile:
+    dest=/etc/hosts
+    line="{{ hostvars[inventory_hostname]['ansible_eth0']['ipv4']['address'] }} {{ inventory_hostname }} {{ ansible_hostname }}"
+    regexp="^{{ hostvars[inventory_hostname]['ansible_eth0']['ipv4']['address'] }}.*$"
+    state=present
+  when: user != 'vagrant'

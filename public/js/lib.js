@@ -38,71 +38,40 @@ function _eraseState() {
 
 $(document).ready(function() {
   var startButton = $('a.start_batton'),
-//      _player = jwplayer('player_id'),
-      _vPlayer = videojs('vplayer_id'),
+      _player = jwplayer('player_id'),
       isStateChecking = false;
 
     function playerStop(){
-        _vPlayer.pause();
+        _player.stop();
     }
 
     function playerPlay(){
-        _vPlayer.play();
+        _player.play(true);
     }
 
-//  _player.on('all', function(some){
-//    console.log(some);
-//  });
-//  _player.on('play', function(oldstate){
-//    console.log('Play, after ' + oldstate);
-//  });
-//
-//  _player.on('pause', function(oldstate){
-//    console.log('Pause, after ' + oldstate);
-//  });
-//
-//  _player.on('complete', function(){
-//    console.log('Playback completed');
-//  });
-//
-//  _player.on('buffer', function(newState, oldstate, reason){
-//    console.log('Buffer with ' + newState + ', after ' + oldstate + ', reason: ' + reason);
-//  });
-//
-//  _player.on('error', function(err){
-//    console.log(err);
-//  });
-//
-//  _player.on('errorSetup', function(err){
-//    console.log(err);
-//  });
-
   function playerSetup(stream_id) {
-//      var conf = {
-//        autostart: false,
-//        width: 1,
-//        height: 1,
+      var conf = {
+        autostart: false,
+        width: 1,
+        height: 1,
 //        androidhls: true,
-//        playlist: [{
-//          sources: [{
-//            file: 'http://' + DOMAIN + ':' + PORT + '/' + CHANNEL + '/' + stream_id + '_ff.m3u8'
-//          }, {
-//            file: 'http://' + DOMAIN + ':' + PORT + '/' + CHANNEL + '/' + stream_id + '.mp3'
-//          }, {
-//            file: 'rtmp://' + DOMAIN + '/' + CHANNEL + '/' + stream_id
+        playlist: [{
+          sources: [
+           {
+            file: 'rtmp://' + DOMAIN + '/' + CHANNEL + '/' + stream_id
+          },
+           {
+            file: 'http://' + DOMAIN + ':' + PORT + '/' + CHANNEL + '/' + stream_id + '.mp3'
+          },
+//{
+//            file: 'http://' + DOMAIN + '/' + 'hls' + '/' + CHANNEL + '/' + stream_id + '.m3u8'
 //          },
-//
-//
-//          ]
-//        }],
-//        primary: 'html5'
-//      };
-//      _player.setup(conf);
-    _vPlayer.src([
-      { type: "rtmp/flv", src: 'rtmp://' + DOMAIN + '/' + CHANNEL + '/' + stream_id },
-//      { type: 'application/x-mpegURL', src: 'http://' + DOMAIN + ':' + PORT + '/' + CHANNEL + '/' + stream_id + '_ff.m3u8' },
-      { type: "audio/mp3", src: 'http://' + DOMAIN + ':' + PORT + '/' + CHANNEL + '/' + stream_id + '.mp3' }
-    ]);
+
+          ]
+        }],
+        primary: 'html5'
+      };
+      _player.setup(conf);
   }
 
   // State pusher

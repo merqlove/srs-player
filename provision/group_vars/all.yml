@@ -1,5 +1,5 @@
 ---
-app_host: 192.168.11
+app_host: 192.168.10.11
 apt_cache_valid_time: 86400
 default_timezone: Europe/Moscow
 user: player

@@ -9,6 +9,7 @@ from random import randint
 import redis
 import time
 import logging
+import sys
 import atexit
 import psutil
 import threading
@@ -28,6 +29,7 @@ FILE_DIR = os.getenv('FILE_DIR', 'mp3')
 # PLAYLIST = os.getenv('PLAYLIST', '/vagrant/mp3/%s.mp3' % randint(1, 4))
 LOG_FILE = 'player.log'
 ERROR_LOG_FILE = 'player.error.log'
+FFMPEG_ERROR_LOG_FILE = 'player.ffmpeg.log'
 CODEC = 'libmp3lame'
 BITRATE = '256k'
 RATE = '44100'
@@ -38,6 +40,8 @@ ACTIVE_STREAM = 30
 
 r = redis.StrictRedis(host='localhost', port=6379, db=0)
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app)
+on_exit = False
 
 
 def is_develop():
@@ -52,7 +56,12 @@ if not is_develop():
 def state_loop(interval):
     manage_states()
     try:
-        threading.Timer(interval, state_loop, [interval]).start()
+        if on_exit:
+            pass
+        else:
+            t = threading.Timer(interval, state_loop, [interval])
+            t.daemon = True
+            t.start()
     except TypeError:
         pass
 
@@ -66,12 +75,19 @@ def stream_path(stream_id):
 
 
 def is_process_running(pid):
-    try:
+    if psutil.pid_exists(int(pid)):
         proc = psutil.Process(int(pid))
         status = proc.status()
-        return status == psutil.STATUS_RUNNING
-    except (OSError, psutil.NoSuchProcess):
-        return False
+        return status != psutil.STATUS_ZOMBIE and status != psutil.STATUS_STOPPED
+    return False
+
+
+def is_process_stopped(pid):
+    if psutil.pid_exists(int(pid)):
+        proc = psutil.Process(int(pid))
+        status = proc.status()
+        return status == psutil.STATUS_ZOMBIE or status == psutil.STATUS_STOPPED
+    return True
 
 
 def run(stream_id=None, playlist=None, retry=False):
@@ -81,7 +97,7 @@ def run(stream_id=None, playlist=None, retry=False):
             return stream_id
 
     if not retry:
-        stream_id = uuid.uuid4()
+        stream_id = str(uuid.uuid4())
 
     if not playlist:
         playlist = file_path()
@@ -98,11 +114,9 @@ def run(stream_id=None, playlist=None, retry=False):
                '-f', 'flv',
                stream_path(stream_id)
                ]
-
-    log_file = open(LOG_FILE, 'w+')
-    error_log_file = open(ERROR_LOG_FILE, 'w+')
-    pipe = sp.Popen(command, stdout=log_file, stderr=error_log_file, preexec_fn=os.setsid)
-    r.hmset('stream:pid:%s' % stream_id, {'pid': pipe.pid, 'stream_id': stream_id, 'playlist': playlist})
+    error_log_file = open(FFMPEG_ERROR_LOG_FILE, 'w+')
+    pipe = sp.Popen(command, stdout=sp.PIPE, stderr=error_log_file, preexec_fn=os.setsid)
+    r.hmset('stream:pid:%s' % stream_id, {'pid': pipe.pid, 'stream_id': stream_id, 'playlist': playlist, 'new': True})
     return stream_id
 
 
@@ -110,12 +124,17 @@ def find(stream_id):
     return r.hgetall('stream:pid:%s' % stream_id)
 
 
+def stop_pid(pid):
+    if is_process_running(pid):
+        os.killpg(os.getpgid(int(pid)), signal.SIGTERM)
+
+
 def stop(stream_id):
     try:
         pipe = find(stream_id)
-        if pipe and is_process_running(pipe['pid']):
+        if pipe:
             r.delete('stream:pid:%s' % stream_id)
-            os.killpg(os.getpgid(int(pipe['pid'])), signal.SIGTERM)
+            stop_pid(pipe['pid'])
     except redis.ResponseError:
         pass
 
@@ -124,7 +143,6 @@ def push_state(stream_id):
     pipe = find(stream_id)
     if not pipe:
         return False
-
     r.set('stream:state:%s' % stream_id, time.time())
     return True
 
@@ -144,18 +162,25 @@ def restart_pipe(key):
         pipe = r.hgetall(key)
         if pipe and not is_process_running(pipe['pid']):
             stop(pipe['stream_id'])
-            # run(pipe['stream_id'], pipe['playlist'], True)
-            # Make it Random
             run(pipe['stream_id'], None, True)
     except redis.ResponseError:
         pass
+
+
+def stop_old_pipe(key, uid):
+    pipe = r.hgetall(key)
+    if not pipe['new']:
+        stop(uid)
+    else:
+        pipe['new'] = False
+        r.hmset(key, pipe)
 
 
 def manage_states():
     for key in r.scan_iter('stream:pid*'):
         prefix, uid = key.split('stream:pid:')
         if not check_state(uid):
-            stop(uid)
+            stop_old_pipe(key, uid)
         else:
             restart_pipe(key)
 
@@ -211,10 +236,18 @@ def write_state(stream_id):
     return jsonify(status=True, stream_state=state)
 
 
+# Flow helpers
+
 def stop_streams():
     for key in r.scan_iter('stream:pid*'):
         prefix, uid = key.split('stream:pid:')
         stop(uid)
+
+
+def exit_handler(_, __):
+    global on_exit
+    on_exit = True
+    sys.exit(0)
 
 
 # Management Sheduler, check for unused streams & restart needed.
@@ -223,13 +256,17 @@ state_loop(5)
 # Drop all streams at exit.
 atexit.register(stop_streams)
 
-app.wsgi_app = ProxyFix(app.wsgi_app)
+signal.signal(signal.SIGINT, exit_handler)
 
 if __name__ == '__main__':
     formatter = logging.Formatter(
         "[%(asctime)s] {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s")
-    handler = RotatingFileHandler(ERROR_LOG_FILE, maxBytes=10000000, backupCount=5)
-    handler.setLevel(logging.INFO)
-    handler.setFormatter(formatter)
-    app.logger.addHandler(handler)
-    app.run(threaded=True)
+    error_handler = RotatingFileHandler(ERROR_LOG_FILE, maxBytes=10000000, backupCount=5)
+    error_handler.setLevel(logging.DEBUG)
+    error_handler.setFormatter(formatter)
+    app.logger.addHandler(error_handler)
+    access_handler = RotatingFileHandler(LOG_FILE, maxBytes=10000000, backupCount=5)
+    access_handler.setLevel(logging.INFO)
+    access_handler.setFormatter(formatter)
+    app.logger.addHandler(access_handler)
+    app.run()

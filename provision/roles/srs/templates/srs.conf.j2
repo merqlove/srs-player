@@ -7,7 +7,7 @@ srs_log_file        ./objs/srs.log;
 http_server {
     enabled         on;
     listen          8080;
-    dir             {{ srs_root }};
+    dir             ./objs/nginx/html;
 }
 vhost __defaultVhost__ {
     gop_cache       off;
@@ -24,10 +24,17 @@ vhost __defaultVhost__ {
         allow           play        all;
         allow           publish     127.0.0.1;
     }
+    http_remux {
+        enabled     on;
+        fast_cache  30;
+        mount       /[app]/[stream].mp3;
+        hstrs       on;
+    }
 
+    # We will use remux instead hls
     #hls {
     #    enabled         on;
-    #    hls_fragment    5;
+    #    hls_fragment    10;
     #    hls_window      60;
     #    hls_acodec      aac;
     #    hls_cleanup     on;
@@ -36,13 +43,6 @@ vhost __defaultVhost__ {
     #    hls_mount       [app]/[stream].m3u8;
     #    hls_ts_file     [app]/[stream]-[seq].ts;
     #}
-    http_remux {
-        enabled     on;
-        fast_cache  30;
-        mount       /[app]/[stream].mp3;
-        hstrs       on;
-
-    }
     #transcode {
     #    enabled     on;
     #    ffmpeg      /usr/local/bin/ffmpeg;
