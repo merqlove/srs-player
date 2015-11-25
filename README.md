@@ -6,6 +6,10 @@ Requirements:
 - Ansible
 - Vagrant
 
+#Usage
+
+    $ make install
+
 ## Production:
 
     # Provision

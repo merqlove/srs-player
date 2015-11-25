@@ -4,6 +4,9 @@
 
   roles:
     - {role: common, tags: [common]}
+    - {role: ntp,    tags: [ntp] }
     - {role: ffmpeg, tags: [ffmpeg]}
     - {role: srs,    tags: [srs]}
     - {role: player, tags: [player]}
+    - {role: sshd,   tags: [sshd]}
+    - {role: swapfile,   tags: [swap]}

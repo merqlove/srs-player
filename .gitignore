@@ -108,3 +108,4 @@ target/
 
 .vagrant
 provision/hosts
+provision/vendor
