@@ -1,9 +1,9 @@
 ---
-- service: name=ufw state=started
-- ufw: state=enabled
+- service: name=ufw state=stopped
+- ufw: state=disabled
 
-  ufw: rule=allow port={{item.port}} proto={{item.proto}}
-  with_items: ports
+#- ufw: rule=allow port={{item.port}} proto={{item.proto}}
+#  with_items: ports
 
 - get_url: url={{ srs_url }} dest=/tmp sha256sum={{ srs_sum }}
   register: new_install
