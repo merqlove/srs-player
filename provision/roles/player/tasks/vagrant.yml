@@ -1,0 +1,4 @@
+---
+- file: src=/vagrant path={{ app_root }} state=link
+
+- include: prepare.yml

@@ -1,0 +1,4 @@
+---
+- name: reboot
+  sudo: yes
+  command: reboot now

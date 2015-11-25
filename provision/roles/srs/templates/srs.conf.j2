@@ -1,0 +1,61 @@
+# the config for srs
+# @see full.conf for detail config.
+
+listen              1935;
+max_connections     1000;
+srs_log_tank        file;
+srs_log_file        ./objs/srs.log;
+http_server {
+    enabled         on;
+    listen          8080;
+    dir             {{ srs_root }};
+}
+http_api {
+    enabled         on;
+    listen          1985;
+}
+stats {
+    network         0;
+    disk            sda sdb xvda xvdb;
+}
+vhost __defaultVhost__ {
+    gop_cache       off;
+    queue_length    10;
+    min_latency     on;
+    mr {
+        enabled     off;
+    }
+    mw_latency      100;
+    tcp_nodelay     on;
+
+    #hls {
+    #    enabled         on;
+    #    hls_fragment    5;
+    #    hls_window      60;
+    #    hls_acodec      aac;
+    #    hls_cleanup     on;
+    #    hls_storage     disk;
+    #    hls_path        {{ srs_root }};
+    #    hls_mount       [app]/[stream].m3u8;
+    #    hls_ts_file     [app]/[stream]-[seq].ts;
+    #}
+    http_remux {
+        enabled     on;
+        fast_cache  30;
+        mount       /[app]/[stream].mp3;
+        hstrs       on;
+
+    }
+    #transcode {
+    #    enabled     on;
+    #    ffmpeg      /usr/local/bin/ffmpeg;
+    #    engine ff {
+    #        enabled         on;
+    #        vcodec          vn;
+    #        acodec          libfdk_aac;
+    #        aparams {
+    #        }
+    #        output          rtmp://127.0.0.1:[port]/[app]?vhost=[vhost]/[stream]_[engine];
+    #    }
+    #}
+}

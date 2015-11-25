@@ -1,0 +1,8 @@
+---
+- hosts: all
+  sudo: yes
+  roles:
+    - {role: common, tags: [common]}
+    - {role: ffmpeg, tags: [ffmpeg]}
+    - {role: srs,    tags: [srs]}
+    - {role: player, tags: [player]}

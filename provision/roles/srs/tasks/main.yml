@@ -1,0 +1,22 @@
+---
+- get_url: url={{ srs_url }} dest=/tmp sha256sum={{ srs_sum }}
+  register: new_install
+
+- unarchive: src=/tmp/{{ srs_release }}.zip dest=/tmp copy=no
+  when: new_install.changed
+
+- file: state=directory path={{ srs_root }}
+
+- copy: src=crossdomain.xml dest={{ srs_root }}
+
+- name: stop srs
+  service: name=srs state=stopped
+  when: new_install.changed
+
+- command: ./INSTALL -y
+  args:
+    chdir: /tmp/{{ srs_release }}
+    creates: /usr/local/srs
+
+- template: src=srs.conf.j2 dest=/usr/local/srs/conf/srs.conf
+  notify: restart srs

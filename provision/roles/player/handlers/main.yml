@@ -1,0 +1,12 @@
+---
+- name: restart nginx
+  service: name=nginx state=restarted
+
+- name: reload nginx
+  service: name=nginx state=reloaded
+
+- name: restart player
+  service: name=player state=restarted
+
+- name: start player
+  service: name=player state=start

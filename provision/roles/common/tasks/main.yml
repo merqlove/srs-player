@@ -1,0 +1,27 @@
+---
+- name: install add-apt-repository binary for Ansible to work
+  apt: name=python-software-properties update_cache=yes cache_valid_time=3600
+
+- name: install dependencies
+  action: apt pkg={{ item }} state=present
+  with_items:
+    - git-core
+    - gcc
+    - g++
+    - patch
+    - make
+    - autoconf
+    - automake
+    - build-essential
+    - libtool
+    - python-dev
+    - python-pip
+    - python-virtualenv
+    - zlib1g-dev
+    - zip
+    - unzip
+    - redis-server
+    - nginx
+
+- lineinfile: dest=/etc/sysctl.conf line="vm.overcommit_memory = 1"
+  notify: reboot

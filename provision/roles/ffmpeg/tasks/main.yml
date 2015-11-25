@@ -1,0 +1,93 @@
+---
+- apt: update_cache=yes cache_valid_time=3600
+
+- name: install dependencies
+  action: apt pkg={{ item }} state=present
+  with_items:
+    - pkg-config
+    - texi2html
+    - zlib1g-dev
+    - libspeex-dev
+    - libmp3lame-dev
+
+# Git
+
+- name: clone latest yasm
+  git: repo=git://github.com/yasm/yasm.git
+       dest={{ source_dir }}/yasm
+       version="v1.2.0"
+       accept_hostkey=yes
+
+- name: clone latest fdk-aac
+  git: repo=git://github.com/mstorsjo/fdk-aac.git
+       dest={{ source_dir }}/fdk-aac
+       version="v0.1.3"
+       accept_hostkey=yes
+
+- name: clone latest x264
+  git: repo=git://git.videolan.org/x264.git
+       dest={{ source_dir }}/x264
+       version=stable
+       accept_hostkey=yes
+
+- name: clone latest ffmpeg
+  git: repo=git://source.ffmpeg.org/ffmpeg.git
+       dest={{ source_dir }}/ffmpeg
+       version="n2.8.2"
+       accept_hostkey=yes
+
+# Compiling
+
+- name: compile yasm
+  command: "{{ item }}"
+  args:
+    chdir: "{{ source_dir }}/yasm"
+    creates: "{{ bin_dir }}/yasm"
+  with_items:
+    - ./autogen.sh
+    - ./configure --bindir={{ bin_dir }}
+    - make
+    - make install
+    - make distclean
+
+- name: compile x264
+  command: "{{ item }}"
+  args:
+    chdir: "{{ source_dir }}/x264"
+    creates: "{{ bin_dir }}/x264"
+  with_items:
+    - "./configure --bindir={{ bin_dir }} --enable-static --disable-opencl \
+      --bit-depth=8 --disable-avs --disable-swscale \
+      --disable-lavf --disable-ffms --disable-gpac"
+    - make
+    - make install
+    - make distclean
+
+- name: compile fdk-aac
+  command: "{{ item }}"
+  args:
+    chdir: "{{ source_dir }}/fdk-aac"
+    creates: "{{ lib_dir }}/libfdk-aac.a"
+  with_items:
+    - autoreconf -fiv
+    - ./configure --disable-shared
+    - make
+    - make install
+    - make distclean
+
+- name: compile ffmpeg
+  command: "{{ item }}"
+  args:
+    chdir: "{{ source_dir }}/ffmpeg"
+    creates: "{{ bin_dir }}/ffmpeg"
+  with_items:
+    - "./configure --bindir={{ bin_dir }} --enable-gpl --enable-nonfree --cc= \
+      --enable-static --disable-shared --disable-debug \
+      --disable-ffplay --disable-ffprobe --disable-ffserver --disable-doc \
+      --enable-postproc --enable-bzlib --enable-zlib --enable-parsers \
+      --enable-libx264 --enable-libmp3lame --enable-libfdk-aac --enable-libspeex \
+      --enable-pthreads --extra-libs=-lpthread \
+      --enable-encoders --enable-decoders --enable-avfilter --enable-muxers --enable-demuxers"
+    - make
+    - make install
+    - make distclean

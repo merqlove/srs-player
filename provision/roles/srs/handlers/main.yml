@@ -1,0 +1,12 @@
+---
+- name: restart srs
+  service: name=srs state=restarted
+
+- name: reload srs
+  service: name=srs state=reloaded
+
+- name: start srs
+  service: name=srs state=started
+
+- name: stop srs
+  service: name=srs state=stopped

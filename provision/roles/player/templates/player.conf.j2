@@ -1,0 +1,11 @@
+description "{{ app_name }}"
+
+start on (filesystem)
+stop on runlevel [016]
+
+respawn
+setuid {{ user }}
+setgid {{ user }}
+chdir {{ app_root }}
+
+exec {{ app_path }}/bin/gunicorn {{ app_name }}:app --bind {{ app_bind }} --access-logfile {{ app_root }}/player.access.log --error-logfile {{ app_root }}/player.error.log
