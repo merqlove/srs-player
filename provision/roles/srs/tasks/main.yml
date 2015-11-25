@@ -1,4 +1,7 @@
 ---
+- service: name=ufw stated=stopped
+- service: name=ufw stated=disabled
+
 - get_url: url={{ srs_url }} dest=/tmp sha256sum={{ srs_sum }}
   register: new_install
 
