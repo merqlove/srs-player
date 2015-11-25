@@ -22,8 +22,12 @@ Vagrant.configure(2) do |config|
     ansible.sudo           = true
     ansible.tags           = ENV['TAGS']
     ansible.raw_arguments  = ENV['ANSIBLE_ARGS']
+    ansible.groups         = {
+      streamer: ['default'],
+      development: => ['default']
+    }
     ansible.extra_vars     = {
-                               user: 'vagrant'
-                             }
+      user: 'vagrant'
+    }
   end
 end

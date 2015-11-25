@@ -1,2 +1,7 @@
 ---
 user: player
+ports:
+  - { port: 1935, proto: tcp}
+  - { port: 1985, proto: tcp}
+  - { port: 8080, proto: tcp}
+  - { port: 80, proto: tcp}

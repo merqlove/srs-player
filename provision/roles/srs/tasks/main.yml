@@ -1,6 +1,9 @@
 ---
-- service: name=ufw stated=stopped
-- service: name=ufw stated=disabled
+- service: name=ufw state=started
+- ufw: state=enabled
+
+  ufw: rule=allow port={{item.port}} proto={{item.proto}}
+  with_items: ports
 
 - get_url: url={{ srs_url }} dest=/tmp sha256sum={{ srs_sum }}
   register: new_install
@@ -12,9 +15,13 @@
 
 - copy: src=crossdomain.xml dest={{ srs_root }}
 
+- stat: path=/usr/local/srs
+  register: srs
+
 - name: stop srs
   service: name=srs state=stopped
   when: new_install.changed
+  when: srs.stat.isdir is defined and srs.stat.isdir
 
 - command: ./INSTALL -y
   args:

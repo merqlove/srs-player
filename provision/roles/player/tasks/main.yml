@@ -1,5 +1,5 @@
 ---
-- user: name={{ user }} comment="Mubicon" group={{ user }}
+- include: user.yml
   when: user != 'vagrant'
 
 - file: state=directory path={{ app_path }} owner={{ user }} group={{ user }}

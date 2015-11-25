@@ -1,0 +1,3 @@
+---
+- group: name={{ user }} state=present
+- user: name={{ user }} comment="Mubicon" group={{ user }}
