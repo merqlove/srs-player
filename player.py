@@ -20,7 +20,7 @@ from werkzeug.contrib.fixers import ProxyFix
 FLASK_ENV = os.getenv('FLASK_ENV', 'develop')
 FFMPEG_BIN = os.getenv('FFMPEG_BIN', "/usr/local/bin/ffmpeg")
 DOMAIN = os.getenv('STREAM', "192.168.10.11")
-RTMP_DOMAIN = os.getenv('RTMP_DOMAIN', "127.0.0.1")
+RTMP_DOMAIN = os.getenv('RTMP_DOMAIN', "127.0.0.1:1935")
 CHANNEL = os.getenv('CHANNEL', "live")
 SRS_PORT = os.getenv('SRS_PORT', "8080")
 PROTO = os.getenv('PROTO', 'rtmp://')
