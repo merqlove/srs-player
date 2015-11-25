@@ -24,7 +24,7 @@ Vagrant.configure(2) do |config|
     ansible.raw_arguments  = ENV['ANSIBLE_ARGS']
     ansible.groups         = {
       streamer: ['default'],
-      development: => ['default']
+      development: ['default']
     }
     ansible.extra_vars     = {
       user: 'vagrant'
