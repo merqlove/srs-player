@@ -9,23 +9,21 @@ http_server {
     listen          8080;
     dir             {{ srs_root }};
 }
-http_api {
-    enabled         on;
-    listen          1985;
-}
-stats {
-    network         0;
-    disk            sda sdb xvda xvdb;
-}
 vhost __defaultVhost__ {
-    #gop_cache       off;
-    #queue_length    10;
-    #min_latency     on;
-    #mr {
-    #    enabled     off;
-    #}
-    #mw_latency      100;
-    #tcp_nodelay     on;
+    gop_cache       off;
+    queue_length    10;
+    min_latency     on;
+    mr {
+        enabled     off;
+    }
+    mw_latency      100;
+    tcp_nodelay     on;
+
+    security {
+        enabled         on;
+        allow           play        all;
+        allow           publish     127.0.0.1;
+    }
 
     #hls {
     #    enabled         on;

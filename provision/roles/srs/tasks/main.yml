@@ -1,8 +1,8 @@
 ---
-- service: name=ufw state=stopped
 - ufw: state=disabled
+- service: name=ufw state=stopped
 
-#- ufw: rule=allow port={{item.port}} proto={{item.proto}}
+#- ufw: rule=allow port={{item.port}}
 #  with_items: ports
 
 - get_url: url={{ srs_url }} dest=/tmp sha256sum={{ srs_sum }}
