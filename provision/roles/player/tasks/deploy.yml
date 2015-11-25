@@ -4,6 +4,6 @@
        dest="{{app_root}}"
        version=master
        accept_hostkey=yes
-  register: git
+  notify: restart player
 
 - include: prepare.yml

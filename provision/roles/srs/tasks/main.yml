@@ -20,8 +20,7 @@
 
 - name: stop srs
   service: name=srs state=stopped
-  when: new_install.changed
-  when: srs.stat.isdir is defined and srs.stat.isdir
+  when: new_install.changed and srs.stat.isdir is defined and srs.stat.isdir
 
 - command: ./INSTALL -y
   args:
@@ -30,3 +29,5 @@
 
 - template: src=srs.conf.j2 dest=/usr/local/srs/conf/srs.conf
   notify: restart srs
+
+- service: name=srs enabled=true state=started

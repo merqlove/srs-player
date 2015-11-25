@@ -1,6 +1,5 @@
 ---
 srs_release: "SRS-Ubuntu14-x86_64-2.0.195"
 srs_sum: a6ff1e0dfe770404823ce738464dbbb11d7844047bdf82e94b4d97f614058a40
-srs_url: "http://ossrs.net/srs.release/releases/files/{{ srs_release }}.zip"
+srs_url: "http://winlinvip.github.io/srs.release/releases/files/{{ srs_release }}.zip"
 srs_root: /tmp/hls
-
