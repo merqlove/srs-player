@@ -64,7 +64,7 @@ $(document).ready(function() {
             file: 'http://' + DOMAIN + ':' + PORT + '/' + CHANNEL + '/' + stream_id + '.mp3'
           },
 //{
-//            file: 'http://' + DOMAIN + '/' + 'hls' + '/' + CHANNEL + '/' + stream_id + '.m3u8'
+//            file: 'http://' + DOMAIN + ':' + PORT + '/' + CHANNEL + '/' + stream_id + '.m3u8'
 //          },
 
           ]

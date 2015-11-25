@@ -7,7 +7,7 @@ srs_log_file        ./objs/srs.log;
 http_server {
     enabled         on;
     listen          8080;
-    dir             ./objs/nginx/html;
+    dir             {{ srs_root }};
 }
 vhost __defaultVhost__ {
     gop_cache       off;
@@ -32,6 +32,11 @@ vhost __defaultVhost__ {
     }
 
     # We will use remux instead hls
+    #http {
+    #    enabled     on;
+    #    mount       [vhost]/;
+    #    dir         {{ srs_root }};
+    #}
     #hls {
     #    enabled         on;
     #    hls_fragment    10;
