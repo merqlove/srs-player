@@ -19,7 +19,7 @@ Requirements:
     $ make deploy
 
     # Provision with tags
-    $ TAGS=provision make deploy
+    $ TAGS=player make provision
 
 ## Development:
 
