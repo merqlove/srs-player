@@ -22,6 +22,7 @@ Requirements:
     $ TAGS=player make provision
 
 ## Development:
+Server url: http://192.168.10.11
 
     # Setup server
     $ vagrant up
